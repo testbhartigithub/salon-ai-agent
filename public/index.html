@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Supervisor Dashboard - Salon AI</title>
+<script src="/socket.io/socket.io.js"></script>
+<style>
+* 
+{
+box-sizing: border-box; 
+margin: 0;
+padding: 0; 
+}
+body { 
+font-family: 'Inter', sans-serif; 
+background: #f0f4f8;
+min-height: 100vh; }
+header { 
+  background: linear-gradient(90deg,#667eea,#764ba2); 
+  color:white; 
+  padding:1.2rem; 
+  text-align:center; 
+  font-size:1.8rem; 
+  font-weight:700; 
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+main { 
+  padding:2rem; 
+  max-width:900px;
+   margin:0 auto;}
+.card 
+{ 
+  background:white;
+  border-radius:16px; 
+  box-shadow:0 8px 20px rgba(0,0,0,0.08); 
+  padding:1.5rem; margin-bottom:1.5rem; 
+  transition:transform 0.2s, 
+  box-shadow 0.2s;}
+.card:hover { 
+  transform:translateY(-4px); 
+  box-shadow:0 12px 25px rgba(0,0,0,0.15);}
+.card h3 { 
+  font-size:1.25rem; 
+  margin-bottom:0.75rem; 
+  display:flex; 
+  align-items:center; 
+  gap:0.5rem;}
+.card p { 
+  font-size:0.95rem; 
+  color:#555; 
+  margin-bottom:0.5rem;}
+input[type="text"] { 
+  padding:0.6rem 0.8rem; 
+  font-size:1rem; 
+  border:1px solid #d1d5db; 
+  border-radius:10px; 
+  width:calc(100% - 120px); 
+  margin-right:10px;}
+button { 
+  padding:0.6rem 1rem; 
+  font-size:1rem; 
+  font-weight:600; 
+  border:none; 
+  border-radius:12px; 
+  background:linear-gradient(90deg,#667eea,#764ba2); 
+  color:white; 
+  cursor:pointer;}
+button:hover:not(:disabled) { 
+  transform:translateY(-2px); 
+  box-shadow:0 6px 18px rgba(0,0,0,0.2);}
+button:disabled { 
+  background:#d1d5db; 
+  cursor:not-allowed;}
+.answer-container { 
+  display:flex; 
+  gap:0.5rem; 
+  margin-top:0.75rem;}
+.answered p { 
+  color:#10b981; 
+  font-weight:600;}
+@media(max-width:600px){ input[type="text"]{
+  width:100%; margin-bottom:0.5rem;} .answer-container{flex-direction:column;} }
+</style>
+</head>
+<body>
+<header>💇‍♀️ Salon AI - Supervisor Dashboard</header>
+<main>
+<div id="requests"></div>
+</main>
+
+<script>
+const socket = io();
+let requests = [];
+
+socket.on("helpRequests", (data) => {
+  requests = data;
+  renderRequests();
+});
+
+function renderRequests() {
+  const container = document.getElementById("requests");
+  container.innerHTML = "";
+
+  const sorted = [...requests].sort((a,b)=>a.answered-b.answered);
+
+  sorted.forEach(req => {
+    const div = document.createElement("div");
+    div.className = "card" + (req.answered?" answered":"");
+    div.innerHTML = `
+      <h3>${req.answered?'✅':'❓'} ${req.question}</h3>
+      <p><b>Time:</b> ${new Date(req.time).toLocaleString()}</p>
+      ${req.answered
+        ? `<p><b>Answer:</b> ${req.answer}</p>`
+        : `<div class="answer-container">
+            <input type="text" id="ans-${req.question}" placeholder="Type your answer..." />
+            <button onclick="sendAnswer('${req.question}')">Submit</button>
+          </div>`
+      }
+    `;
+    container.appendChild(div);
+  });
+}
+
+function sendAnswer(question){
+  const input = document.getElementById(`ans-${question}`);
+  const answer = input.value.trim();
+  if(!answer) return alert("Please type an answer!");
+  const idx = requests.findIndex(r=>r.question===question);
+  if(idx!==-1){ requests[idx].answered=true; requests[idx].answer=answer; renderRequests();}
+  socket.emit("answerQuestion",{question,answer});
+}
+</script>
+</body>
+</html>

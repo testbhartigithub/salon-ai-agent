@@ -1,0 +1,23 @@
+[
+  {
+    "question": "kaise ho",
+    "time": "2025-11-05T16:30:54.381Z",
+    "answered": true,
+    "answer": "bdiyaa",
+    "answeredAt": "2025-11-05T16:31:00.416Z"
+  },
+  {
+    "question": "Do you do makeup?",
+    "time": "2025-11-05T18:08:04.971Z",
+    "answered": true,
+    "answer": "Yes I do",
+    "answeredAt": "2025-11-05T18:08:33.385Z"
+  },
+  {
+    "question": "Do you like mehandi?",
+    "time": "2025-11-05T18:09:26.739Z",
+    "answered": true,
+    "answer": "Yes we do",
+    "answeredAt": "2025-11-05T18:09:38.370Z"
+  }
+]
