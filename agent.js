@@ -5,11 +5,10 @@ import { Server } from "socket.io";
 import express from "express";
 import readline from "readline/promises";
 
-// ================= File paths =================
 const HELP_FILE = "./helpRequests.json";
 const KNOWLEDGE_FILE = "./knowledgeBase.json";
 
-// ================= Helper functions =================
+
 function load(file) {
   if (!fs.existsSync(file)) fs.writeFileSync(file, "[]");
   return JSON.parse(fs.readFileSync(file));
@@ -34,23 +33,21 @@ function createHelpRequest(question) {
   return newReq;
 }
 
-// ================= Socket.IO Supervisor Dashboard =================
+
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, { cors: { origin: "*" } });
 const PORT = 4000;
 
-// Serve static dashboard files
 app.use(express.static("public"));
 
-// Supervisor connections
+
 io.on("connection", socket => {
   console.log("🧑‍💻 Supervisor connected");
 
-  // Send all current help requests
   socket.emit("helpRequests", load(HELP_FILE));
 
-  // When supervisor answers a question
+
   socket.on("answerQuestion", ({ question, answer }) => {
     const requests = load(HELP_FILE);
     const req = requests.find(r => r.question === question);
