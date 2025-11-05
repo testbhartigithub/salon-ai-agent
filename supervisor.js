@@ -10,7 +10,7 @@ const KNOWLEDGE_FILE = "./knowledgeBase.json";
 app.use(bodyParser.json());
 app.use(express.static("public"));
 
-// Helper functions
+
 function load(file) {
   if (!fs.existsSync(file)) fs.writeFileSync(file, JSON.stringify([]));
   return JSON.parse(fs.readFileSync(file));
@@ -20,13 +20,13 @@ function save(file, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2));
 }
 
-// API: Get all pending requests
+
 app.get("/requests", (req, res) => {
   const requests = load(HELP_FILE);
   res.json(requests);
 });
 
-// API: Submit supervisor answer
+
 app.post("/respond", (req, res) => {
   const { question, answer } = req.body;
 
@@ -39,7 +39,7 @@ app.post("/respond", (req, res) => {
   target.answeredAt = new Date().toISOString();
   save(HELP_FILE, requests);
 
-  // Update Knowledge Base
+
   const kb = load(KNOWLEDGE_FILE);
   kb.push({ question, answer });
   save(KNOWLEDGE_FILE, kb);
@@ -48,7 +48,7 @@ app.post("/respond", (req, res) => {
   res.send({ success: true });
 });
 
-// Start server
+
 app.listen(PORT, () => {
   console.log(`🧑‍💻 Supervisor dashboard running at http://localhost:${PORT}`);
 });
