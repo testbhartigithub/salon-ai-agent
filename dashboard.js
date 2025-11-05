@@ -5,7 +5,7 @@ import { Server } from "socket.io";
 const HELP_FILE = "./helpRequests.json";
 const KNOWLEDGE_FILE = "./knowledgeBase.json";
 
-// Helper functions
+
 function load(file) {
   if (!fs.existsSync(file)) fs.writeFileSync(file, "[]");
   return JSON.parse(fs.readFileSync(file));
@@ -28,7 +28,7 @@ function createHelpRequest(question) {
   return newReq;
 }
 
-// ================= Socket.IO for supervisor dashboard =================
+
 const app = require("express")();
 const httpServer = require("http").createServer(app);
 const io = new Server(httpServer, { cors: { origin: "*" } });
@@ -56,7 +56,7 @@ io.on("connection", socket => {
 
       io.emit("helpRequests", requests);
 
-      // Notify CLI AI
+      
       console.log(`\nAI: Supervisor answered: "${answer}" for question "${question}"\n`);
       waitingResolve && waitingResolve(); // allow next question
     }
@@ -67,7 +67,7 @@ httpServer.listen(PORT, () => {
   console.log(`Supervisor Dashboard running at http://localhost:${PORT}`);
 });
 
-// ================= CLI Question Handling =================
+
 import readline from "readline/promises";
 const rl = readline.createInterface({
   input: process.stdin,
@@ -89,11 +89,11 @@ async function askClientSequential() {
 
     console.log("AI: Let me check with my supervisor...\n");
 
-    // Create help request
+
     createHelpRequest(question);
     io.emit("helpRequests", load(HELP_FILE));
 
-    // Wait until supervisor answers
+
     await new Promise(resolve => { waitingResolve = resolve; });
   }
 }
